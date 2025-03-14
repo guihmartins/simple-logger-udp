@@ -1,0 +1,30 @@
+{
+  "name": "simple-logger-udp",
+  "version": "1.0.0",
+  "description": "A simple UDP logger with Graylog support",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "test": "jest"
+  },
+  "keywords": [
+    "logger",
+    "graylog",
+    "udp",
+    "typescript"
+  ],
+  "author": "Guilherme Martins",
+  "license": "MIT",
+  "dependencies": {
+    "pino": "^9.6.0",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "@types/uuid": "^10.0.0",
+    "pino-pretty": "^13.0.0",
+    "typescript": "^5.8.2"
+  }
+}

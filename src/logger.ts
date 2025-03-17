@@ -2,7 +2,7 @@ import pino from 'pino';
 import * as dgram from 'dgram';
 import { v4 as uuidv4 } from 'uuid';
 import os from 'os';
-import { getValue } from './config';
+import { getValue } from './environment';
 
 // Interface para padronizar o formato do log
 export interface StandardLogFormat {
@@ -66,7 +66,7 @@ const LOG_LEVEL_NAMES: {[key: number]: string} = {
 
 // Função para verificar se um nível de log deve ser exibido
 function shouldLog(logLevel: number): boolean {
-    const configLogLevel = getValue('logLevel') || 'info';
+    const configLogLevel = getValue('graylogLogLevel') || 'info';
     const configLevelValue = LOG_LEVELS[configLogLevel as keyof typeof LOG_LEVELS];
     
     // Se o nível do log for menor ou igual ao configurado, deve ser exibido
@@ -203,7 +203,7 @@ if (graylogConfig.enabled) {
 
 // Instância do logger
 const logger = pino({
-    level: getValue('logLevel') || 'info',
+    level: getValue('graylogLogLevel') || 'info',
     transport: {
         target: 'pino-pretty',
         options: { colorize: true }

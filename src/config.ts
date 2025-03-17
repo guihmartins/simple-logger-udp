@@ -39,9 +39,6 @@ export function configureLogger(config: Partial<LoggerConfig>): void {
  * @param key Nome da configuração
  * @returns Valor da configuração
  */
-export function getValue<K extends keyof LoggerConfig>(key: K): LoggerConfig[K] {
-  return currentConfig[key];
-}
 
 /**
  * Obtém a configuração atual

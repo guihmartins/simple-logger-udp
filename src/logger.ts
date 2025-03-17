@@ -2,7 +2,7 @@ import pino from 'pino';
 import * as dgram from 'dgram';
 import { v4 as uuidv4 } from 'uuid';
 import os from 'os';
-import { getValue } from './config';
+import { getValue } from './environment';
 
 // Interface para padronizar o formato do log
 export interface StandardLogFormat {
@@ -54,6 +54,25 @@ const LOG_LEVELS = {
     info: 6,   // info
     debug: 7   // debug
 };
+
+// Mapeamento invertido para converter número em string
+const LOG_LEVEL_NAMES: {[key: number]: string} = {
+    2: 'fatal',
+    3: 'error',
+    4: 'warn',
+    6: 'info',
+    7: 'debug'
+};
+
+// Função para verificar se um nível de log deve ser exibido
+function shouldLog(logLevel: number): boolean {
+    const configLogLevel = getValue('graylogLogLevel') || 'info';
+    const configLevelValue = LOG_LEVELS[configLogLevel as keyof typeof LOG_LEVELS];
+    
+    // Se o nível do log for menor ou igual ao configurado, deve ser exibido
+    // (Níveis menores são mais graves no padrão Syslog)
+    return logLevel <= configLevelValue;
+}
 
 // Classe de transporte UDP para Graylog
 class GraylogTransport {
@@ -184,7 +203,7 @@ if (graylogConfig.enabled) {
 
 // Instância do logger
 const logger = pino({
-    level: getValue('logLevel') || 'info',
+    level: getValue('graylogLogLevel') || 'info',
     transport: {
         target: 'pino-pretty',
         options: { colorize: true }
@@ -327,6 +346,9 @@ async function testGraylogConnection(): Promise<{success: boolean, message: stri
 const safeLogger = {
     info: (message: any, ...args: any[]) => {
         try {
+            // Verifica se deve logar este nível
+            if (!shouldLog(LOG_LEVELS.info)) return;
+            
             const formattedLog = formatLog(message, LOG_LEVELS.info);
             logger.info(formattedLog, ...args);
             sendToGraylog(formattedLog);
@@ -336,6 +358,9 @@ const safeLogger = {
     },
     error: (message: any, ...args: any[]) => {
         try {
+            // Verifica se deve logar este nível
+            if (!shouldLog(LOG_LEVELS.error)) return;
+            
             const formattedLog = formatLog(message, LOG_LEVELS.error);
             logger.error(formattedLog, ...args);
             sendToGraylog(formattedLog);
@@ -345,6 +370,9 @@ const safeLogger = {
     },
     warn: (message: any, ...args: any[]) => {
         try {
+            // Verifica se deve logar este nível
+            if (!shouldLog(LOG_LEVELS.warn)) return;
+            
             const formattedLog = formatLog(message, LOG_LEVELS.warn);
             logger.warn(formattedLog, ...args);
             sendToGraylog(formattedLog);
@@ -354,6 +382,9 @@ const safeLogger = {
     },
     debug: (message: any, ...args: any[]) => {
         try {
+            // Verifica se deve logar este nível
+            if (!shouldLog(LOG_LEVELS.debug)) return;
+            
             const formattedLog = formatLog(message, LOG_LEVELS.debug);
             logger.debug(formattedLog, ...args);
             sendToGraylog(formattedLog);
@@ -369,6 +400,9 @@ const safeLogger = {
         return {
             info: (message: any, ...args: any[]) => {
                 try {
+                    // Verifica se deve logar este nível
+                    if (!shouldLog(LOG_LEVELS.info)) return;
+                    
                     const baseLog = formatLog(message, LOG_LEVELS.info);
                     const contextualLog = { ...baseLog, ...contextValues };
                     logger.info(contextualLog, ...args);
@@ -379,6 +413,9 @@ const safeLogger = {
             },
             error: (message: any, ...args: any[]) => {
                 try {
+                    // Verifica se deve logar este nível
+                    if (!shouldLog(LOG_LEVELS.error)) return;
+                    
                     const baseLog = formatLog(message, LOG_LEVELS.error);
                     const contextualLog = { ...baseLog, ...contextValues };
                     logger.error(contextualLog, ...args);
@@ -389,6 +426,9 @@ const safeLogger = {
             },
             warn: (message: any, ...args: any[]) => {
                 try {
+                    // Verifica se deve logar este nível
+                    if (!shouldLog(LOG_LEVELS.warn)) return;
+                    
                     const baseLog = formatLog(message, LOG_LEVELS.warn);
                     const contextualLog = { ...baseLog, ...contextValues };
                     logger.warn(contextualLog, ...args);
@@ -399,6 +439,9 @@ const safeLogger = {
             },
             debug: (message: any, ...args: any[]) => {
                 try {
+                    // Verifica se deve logar este nível
+                    if (!shouldLog(LOG_LEVELS.debug)) return;
+                    
                     const baseLog = formatLog(message, LOG_LEVELS.debug);
                     const contextualLog = { ...baseLog, ...contextValues };
                     logger.debug(contextualLog, ...args);

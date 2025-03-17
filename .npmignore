@@ -6,3 +6,8 @@ tsconfig.json
 jest.config.js
 .gitignore
 *.tgz
+coverage/
+.DS_Store
+.editorconfig
+.eslintrc
+.prettierrc

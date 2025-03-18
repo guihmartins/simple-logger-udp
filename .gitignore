@@ -40,3 +40,5 @@ temp/
 
 # Debug
 .debug/
+__tests__
+.tgz
